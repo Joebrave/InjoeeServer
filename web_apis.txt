@@ -1,0 +1,123 @@
+Enjoee APIs
+
+公用错误码
+1000:   输入错误
+
+约定
+  -在本文档中假设web service的域名为www.enjoee.com
+  -所有API均支持HTTP与HTTPS两种协议，在需要加密时客户端可以选择性调用
+  -如无特别说明, 协议为http或https
+  -如无特别说明, body的数据格式为json
+  -HTTP-HEAD: HTTP协议的head部分
+  -HTTP-BODY: HTTP协议的body部分
+  -STRING: 字符串，UTF-8编码
+  -NUMBER:数字
+  -DATE: 日期及时间, 代表某一个具体的时间点. UTC时间. 具体表示为一个long型整数. Unix epoch(1970.1.1)起的秒数. 
+  -TIME: 代表一段时间长度, 表示为一个整型. 精度为秒
+  -LOCATION: 表示一个确切的地理位置的经纬度的标准格式. JSON表示如下定义. 元素类型为数字. 
+    LOCATION    = {
+        "latitude" = NUMBER,
+        "longitude" = NUMBER,
+    }
+  -URL: 标准URL定义
+  -LOCALE: 参考java.util.locale定义, 由语言码与国家地区码组合而成, 比如zh-cn, zh-tw.
+  -OS-NAME: 操作系统名字, 表示为一个字符串, 如android, ios
+  -OS-VERSION: 操作系统版本号, 由主板本号.副版本号组成, 表示为一个字符串, 如2.1, 4.0
+
+目前已将www.injoee.com绑定IP。
+
+1. 获取游戏列表
+	--Request:
+        URL         = http://www.injoee.com/games/list.php?<start={NUMBER}&count={NUMBER}><&country_code={STRING}><&locale={LOCALE}>
+
+    --Response
+        -200:访问成功
+         HTTP-BODY  = {
+                       "error_code":        NUMBER,
+                       <"games":            [GAME_INFO, ...]>,
+                       <"total":            NUMBER>
+                      }
+
+         GAME_INFO      = {
+                       game_id:                  		NUMBER,
+                       "game_name":              		STRING,
+					   "game_icon":              		URL,
+                       "game_type":						STRING,
+					   "game_category":					ENUM{"ZIP","APK","DPK"},
+					   "game_package_name":				STRING,
+					   <"game_package_size":            STRING>,
+                       <"game_download_url":			URL>,
+					   <"game_obb_package_name:"			STRING>,
+					   <"game_obb_download_url:"		STRING>,
+                      }
+        -错误:
+         1000:                  当输入信息有误时返回1000
+
+        -说明:
+         game_id:         	  	游戏id
+		 game_name:				游戏名
+		 game_description:		游戏描述
+		 game_icon:				游戏的图标
+		 game_package_size:		游戏安装包大小
+		 game_download_url:		游戏的下载地址
+		 game_type:				游戏类别
+		 
+		 
+2. --Request:
+        URL         = http://www.injoee.com/games/detail.php?pkgname={STRING}<&locale={LOCALE}>
+        URL         = http://www.injoee.com/games/detail.php?id={NUMBER}<&locale={LOCALE}>
+
+    --Response
+        -200:访问成功
+         HTTP-BODY  = {
+                       "error_code":        NUMBER,
+                       <"game_detail":      GAME_DETAIL>,
+                      }
+
+         GAME_DETAIL      = {
+                       game_id:                  		NUMBER,
+                       "game_name":              		STRING,
+					   "game_type":						STRING,
+					   "game_category":					ENUM{"ZIP","APK"},
+					   <"game_description":            	STRING>,
+					   <"game_icon":              		URL>,
+                       <"game_package_size":            STRING>,
+					   <"game_download_url":			URL>,
+					   <"game_obb_package_name:"			STRING>,
+					   <"game_obb_download_url:"		STRING>,
+                       <"game_screenshots":				[URL, ...]>,
+					   <"game_good_votes":				NUMBER>,
+					   <"game_bad_votes":				NUMBER>
+                       }
+        -错误:
+         1000:                  当输入信息有误时返回1000
+
+        -说明:
+         game_id:         	  	游戏id
+		 game_name:				游戏名
+		 game_description:		游戏描述
+		 game_icon:				游戏的图标
+		 game_package_size:		游戏安装包大小
+		 game_download_url:		游戏的下载地址
+		 game_type:				游戏类别
+		 game_screenshots:		游戏展示图片
+		 game_good_votes:		点赞的数量
+		 game_bad_votes:		点踩的数量
+                       
+3. --Request:
+        URL         = http://www.injoee.com/games/votes.php?id={NUMBER}&type={ENUM}
+		
+		发起赞或踩。
+		
+    --Response
+        -200:访问成功
+         HTTP-BODY  = {
+                       "error_code":        NUMBER,
+                      }
+
+        -错误:
+         1000:                  当输入信息有误时返回1000
+
+        -说明:
+         id:         	游戏id
+		 type:			good 或 bad
